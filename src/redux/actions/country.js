@@ -7,7 +7,6 @@ import {
 } from "./types";
 
 export const fetchCountry = () => {
-    console.log("Fetching Countries");
     return dispatch => {
         dispatch(fetchCountryRequest());
 

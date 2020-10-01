@@ -3,7 +3,17 @@ import { Form, Button, Row, Col } from "react-bootstrap";
 
 import { withAlert } from "react-alert";
 
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+
+import { createUser } from "../../../redux/actions/user";
+
 class UserForm extends Component {
+    static propTypes = {
+        registerUser: PropTypes.func.isRequired,
+        user: PropTypes.object
+    };
+
     handleFormSubmit = event => {
         event.preventDefault();
 
@@ -13,15 +23,27 @@ class UserForm extends Component {
             formData[field] = this.refs[field].value;
         }
 
-        console.log(formData);
-
-        const { password, confirm_password } = formData;
+        const {
+            password,
+            confirm_password,
+            first_name,
+            last_name,
+            email
+        } = formData;
 
         if (password !== confirm_password) {
             this.props.alert.show("Password is not same.!!");
         } else {
             // Perform API Call and if successfull switch form
-            this.props.switchForm();
+            const userRequestData = {
+                first_name: first_name,
+                last_name: last_name,
+                username: email,
+                password: password,
+                email: email
+            };
+            this.props.registerUser(userRequestData);
+            // this.props.switchForm();
         }
     };
     render() {
@@ -104,4 +126,19 @@ class UserForm extends Component {
     }
 }
 
-export default withAlert()(UserForm);
+// This is how we should map the action creator having Parameter on it. Otherwise the data will be null on action creator
+const mapDispatchToProps = () => {
+    return {
+        registerUser: createUser
+    };
+};
+
+const mapStateToProps = storeState => ({
+    user: storeState.userReducer.user
+});
+
+export default connect(
+    mapStateToProps,
+    // Caution: Here we have an action creator to create a user with the userData
+    mapDispatchToProps()
+)(withAlert()(UserForm));

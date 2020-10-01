@@ -6,6 +6,8 @@ import {
     CREATE_USER_FAIL
 } from "./types";
 
+import { returnErrors, createMessage } from "./messages";
+
 export const createUser = userData => {
     return dispatch => {
         dispatch(createUserRequest());
@@ -15,9 +17,13 @@ export const createUser = userData => {
             .then(response => {
                 const user = response.data;
                 dispatch(createUserSuccess(user));
+                dispatch(createMessage({ info: "User created successfully." }));
             })
             .catch(error => {
-                dispatch(createUserFailed(error.message));
+                dispatch(createUserFailed(error.response.data));
+                dispatch(
+                    returnErrors(error.response.data, error.response.status)
+                );
             });
     };
 };

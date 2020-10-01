@@ -1,18 +1,27 @@
 import React, { Component } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 
-import { withAlert } from "react-alert";
-
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 import { createUser } from "../../../redux/actions/user";
+import { createMessage } from "../../../redux/actions/messages";
 
 class UserForm extends Component {
     static propTypes = {
-        registerUser: PropTypes.func.isRequired,
-        user: PropTypes.object
+        createUser: PropTypes.func.isRequired,
+        createMessage: PropTypes.func.isRequired,
+        user: PropTypes.object.isRequired
     };
+
+    // After Dispatching action, our store gets updated. So using this life cycle hook
+    // We can perform certain action after updating store state
+    componentDidUpdate() {
+        // Check if user is created
+        if (this.props.user.id) {
+            console.log(this.props.user.id);
+        }
+    }
 
     handleFormSubmit = event => {
         event.preventDefault();
@@ -32,7 +41,7 @@ class UserForm extends Component {
         } = formData;
 
         if (password !== confirm_password) {
-            this.props.alert.show("Password is not same.!!");
+            this.props.createMessage({ error: "Please provide same password" });
         } else {
             // Perform API Call and if successfull switch form
             const userRequestData = {
@@ -42,8 +51,11 @@ class UserForm extends Component {
                 password: password,
                 email: email
             };
-            this.props.registerUser(userRequestData);
-            // this.props.switchForm();
+            this.props.createUser(userRequestData);
+
+            // if (this.props.user.id) {
+            //     alert("User created");
+            // }
         }
     };
     render() {
@@ -129,7 +141,8 @@ class UserForm extends Component {
 // This is how we should map the action creator having Parameter on it. Otherwise the data will be null on action creator
 const mapDispatchToProps = () => {
     return {
-        registerUser: createUser
+        createUser: createUser,
+        createMessage: createMessage
     };
 };
 
@@ -141,4 +154,4 @@ export default connect(
     mapStateToProps,
     // Caution: Here we have an action creator to create a user with the userData
     mapDispatchToProps()
-)(withAlert()(UserForm));
+)(UserForm);

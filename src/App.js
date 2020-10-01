@@ -10,6 +10,9 @@ import store from "./redux/store";
 import { positions, Provider as AlertProvider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 
+// Alert App
+import Alert from "./Component/Messages/Alert";
+
 const alertOptions = {
     position: positions.BOTTOM_CENTER,
     timeout: 2000,
@@ -22,6 +25,7 @@ class App extends React.Component {
             // We must wrap our all component in Provider Component. So that every child component receives the state from store.
             <Provider store={store}>
                 <AlertProvider template={AlertTemplate} {...alertOptions}>
+                    <Alert />
                     <Container>
                         <br />
                         <br />

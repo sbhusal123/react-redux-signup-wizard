@@ -5,7 +5,7 @@ import {
 } from "../actions/types";
 
 const initialState = {
-    user: [],
+    user: {},
     error: "",
     loading: true
 };
@@ -19,7 +19,7 @@ const userReducer = (state = initialState, action) => {
             };
         case CREATE_USER_FAIL:
             return {
-                user: [],
+                user: {},
                 error: action.payload,
                 loading: false
             };

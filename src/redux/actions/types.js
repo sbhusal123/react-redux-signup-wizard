@@ -12,3 +12,10 @@ export const FETCH_COUNTRY_FAIL = "FETCH_COUNTRY_FAIL";
 export const CREATE_USER_REQUEST = "CREATE_USER_REQUEST";
 export const CREATE_USER_SUCCESS = "CREATE_USER_SUCCESS";
 export const CREATE_USER_FAIL = "CREATE_USER_FAIL";
+
+// Errors And Alert
+export const GET_ERRORS = "GET_ERRORS";
+
+// Messages
+export const GET_MESSAGE = "GET_MESSAGE";
+export const CREATE_MESSAGE = "CREATE_MESSAGE";

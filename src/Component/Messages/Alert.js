@@ -18,6 +18,9 @@ export class Alerts extends Component {
             if (error.username) {
                 alert.error("Email: User with that email already exists.");
             }
+            if (error.user) {
+                alert.error("User: User alrady exists.");
+            }
         }
 
         // If any message: Message can be of two types error or info

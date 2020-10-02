@@ -6,12 +6,22 @@ import { connect } from "react-redux";
 
 import { fetchUniversity } from "../../../redux/actions/university";
 import { fetchCountry } from "../../../redux/actions/country";
+import { createAgentProfile } from "../../../redux/actions/agent_profile";
+
+import Select from "react-select";
 
 class ProfileForm extends Component {
     // Props provided by store particulary for this Component
     static propTypes = {
         universities: PropTypes.array.isRequired,
-        countries: PropTypes.array.isRequired
+        countries: PropTypes.array.isRequired,
+        createAgentProfile: PropTypes.func.isRequired,
+        agent: PropTypes.object
+    };
+
+    state = {
+        selected_universities: [],
+        imageFile: null
     };
 
     componentDidMount() {
@@ -22,14 +32,53 @@ class ProfileForm extends Component {
         this.props.fetchCountry();
     }
 
+    handleChange = e => {
+        const selected = [];
+
+        if (e !== null) {
+            for (let i = 0; i < e.length; i++) {
+                selected.push(e[i].value);
+            }
+            this.setState({
+                selected_universities: selected
+            });
+        } else if (e == null) {
+            this.setState({
+                selected_universities: []
+            });
+        }
+    };
+
+    onFileChange = event => {
+        // Update the state file
+        this.setState({ imageFile: event.target.files[0] });
+    };
+
     handleFormSubmit = event => {
         event.preventDefault();
 
-        // Get form fields object
-        const formData = {};
+        // Get fileds from form
+        const formData = new FormData();
         for (const field in this.refs) {
-            formData[field] = this.refs[field].value;
+            formData.append(field, this.refs[field].value);
         }
+
+        // Append Universities List
+        for (let i = 0; i < this.state.selected_universities.length; i++) {
+            formData.append("university", this.state.selected_universities[i]);
+        }
+
+        // Append User id stored in localStorage
+        formData.append("user", localStorage.getItem("user_id"));
+
+        // Append profile image data
+        formData.append(
+            "profile_image",
+            this.state.imageFile,
+            this.state.imageFile.name
+        );
+
+        this.props.createAgentProfile(formData);
     };
 
     render() {
@@ -43,15 +92,9 @@ class ProfileForm extends Component {
             }
         );
 
-        const universitiesOptionRender = this.props.universities.map(
-            (el, idx) => {
-                return (
-                    <option key={idx} value={el.id}>
-                        {el.name}
-                    </option>
-                );
-            }
-        );
+        const data = this.props.universities.map((el, idx) => {
+            return { value: el.id, label: el.name };
+        });
 
         return (
             <Form onSubmit={this.handleFormSubmit}>
@@ -88,7 +131,7 @@ class ProfileForm extends Component {
                                 as="select"
                                 placeholder="University"
                                 required
-                                ref="university"
+                                ref="country"
                             >
                                 {countriesOptionRender}
                             </Form.Control>
@@ -97,15 +140,46 @@ class ProfileForm extends Component {
                     <Col xs={12} md={6}>
                         <Form.Group controlId="university">
                             <Form.Label>University</Form.Label>
+                            <Select
+                                className="dropdown"
+                                placeholder="Select University"
+                                options={data} // set list of the data
+                                onChange={this.handleChange} // assign onChange function
+                                isMulti
+                                required
+                            />
+                        </Form.Group>
+                    </Col>
+                </Row>
+
+                <Row>
+                    <Col md={6} xs={12}>
+                        <Form.Group controlId="profile_picture">
+                            <Form.Label>Agent Type</Form.Label>
                             <Form.Control
                                 as="select"
-                                multiple
                                 placeholder="University"
                                 required
-                                ref="university"
+                                ref="type"
                             >
-                                {universitiesOptionRender}
+                                <option disabled selected>
+                                    Select Agent Type
+                                </option>
+                                <option value={1}>Education</option>
+                                <option value={2}>Migration</option>
+                                <option value={3}>Both</option>
                             </Form.Control>
+                        </Form.Group>
+                    </Col>
+                    <Col md={6} xs={12}>
+                        <Form.Group controlId="profile_picture">
+                            <Form.Label>Profile Picture</Form.Label>
+                            <Form.Control
+                                type="file"
+                                required
+                                ref="profile_image"
+                                onChange={this.onFileChange}
+                            />
                         </Form.Group>
                     </Col>
                 </Row>
@@ -127,7 +201,8 @@ const mapDispatchToProps = dispatch => {
     return {
         // PropsName: actualActionCreatorName
         fetchUniversity: () => dispatch(fetchUniversity()),
-        fetchCountry: () => dispatch(fetchCountry())
+        fetchCountry: () => dispatch(fetchCountry()),
+        createAgentProfile: agentData => dispatch(createAgentProfile(agentData))
     };
 };
 
@@ -135,7 +210,8 @@ const mapDispatchToProps = dispatch => {
 const mapStateToProps = storeState => ({
     // PropsName: store.reducer.state
     universities: storeState.universityReducer.universities,
-    countries: storeState.countryReducer.countries
+    countries: storeState.countryReducer.countries,
+    agent: storeState.agentProfileReducer.agent
 });
 
 // Subscribe our Component to the redux store

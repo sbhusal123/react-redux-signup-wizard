@@ -19,7 +19,7 @@ class UserForm extends Component {
     componentDidUpdate() {
         // Check if user is created
         if (this.props.user.id) {
-            console.log(this.props.user.id);
+            this.props.switchForm();
         }
     }
 
@@ -139,10 +139,10 @@ class UserForm extends Component {
 }
 
 // This is how we should map the action creator having Parameter on it. Otherwise the data will be null on action creator
-const mapDispatchToProps = () => {
+const mapDispatchToProps = dispatch => {
     return {
-        createUser: createUser,
-        createMessage: createMessage
+        createUser: userData => dispatch(createUser(userData)),
+        createMessage: message => dispatch(createMessage(message))
     };
 };
 
@@ -150,8 +150,4 @@ const mapStateToProps = storeState => ({
     user: storeState.userReducer.user
 });
 
-export default connect(
-    mapStateToProps,
-    // Caution: Here we have an action creator to create a user with the userData
-    mapDispatchToProps()
-)(UserForm);
+export default connect(mapStateToProps, mapDispatchToProps)(UserForm);

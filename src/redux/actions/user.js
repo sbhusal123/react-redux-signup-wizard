@@ -17,6 +17,7 @@ export const createUser = userData => {
             .then(response => {
                 const user = response.data;
                 dispatch(createUserSuccess(user));
+                localStorage.setItem("user_id", user.id);
                 dispatch(createMessage({ info: "User created successfully." }));
             })
             .catch(error => {
